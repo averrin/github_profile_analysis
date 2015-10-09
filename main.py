@@ -11,7 +11,27 @@ from datetime import datetime, timedelta
 from dateutil import tz
 import time
 import random
-r = lambda: random.randint(0,255)
+import colorsys
+
+
+def get_random_color(pastel_factor = 0.5):
+    return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0,1.0) for i in [1,2,3]]]
+
+def color_distance(c1,c2):
+    return sum([abs(x[0]-x[1]) for x in zip(c1,c2)])
+
+def generate_new_color(existing_colors,pastel_factor = 0.5):
+    max_distance = None
+    best_color = None
+    for i in range(0, 100):
+        color = get_random_color(pastel_factor=pastel_factor)
+        if not existing_colors:
+            return color
+        best_distance = min([color_distance(color,c) for c in existing_colors])
+        if not max_distance or best_distance > max_distance:
+            max_distance = best_distance
+            best_color = color
+    return best_color
 
 CWD = os.path.abspath(os.path.split(sys.argv[0])[0])
 to_zone = tz.tzlocal()
@@ -117,12 +137,14 @@ for repo in _repos:
     if l is None:
         l = 'Unknown'
     if l not in repos['_languages']:
-        c = '#%02X%02X%02X' % (r(),r(),r())
+        c = generate_new_color(colors.values(), pastel_factor=0.5)
         colors[l] = c
         repos['_languages'][l] = [0, 0, c]
     repos['_languages'][l][0] += 1
     repos['_languages'][l][1] = '%s%%' % int(repos['_languages'][l][0] / (len(_repos) - repos['forks']) * 100)
 repos['languages'] = sorted(repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
+for r in repos['languages']:
+    r[1][2] = '#%02X%02X%02X' % tuple([x*255.0 for x in r[1][2]])
 repos['language_names'] = [x[0] for x in repos['languages']]
 
 repos['pulls'].extend(pulls)
@@ -138,10 +160,12 @@ for pr in repos['pulls']:
     if l is None:
         l = 'Unknown'
     if l not in repos['_pulls_languages']:
-        repos['_pulls_languages'][l] = [0, 0, colors.get(l, '#%02X%02X%02X' % (r(),r(),r()))]
+        repos['_pulls_languages'][l] = [0, 0, colors.get(l, generate_new_color(colors.values(), pastel_factor=0.5))]
     repos['_pulls_languages'][l][0] += 1
     repos['_pulls_languages'][l][1] = '%s%%' % int(repos['_pulls_languages'][l][0] / len(repos['pulls']) * 100)
 repos['pulls_languages'] = sorted(repos['_pulls_languages'].items(), key=lambda x: x[1][0], reverse=True)
+for pr in repos['pulls_languages']:
+    pr[1][2] = '#%02X%02X%02X' % tuple([x*255.0 for x in pr[1][2]])
 repos['pulls_language_names'] = [x[0] for x in repos['pulls_languages']]
 
 events = fetch(info['events_url'].replace('{/privacy}', ''))
@@ -158,6 +182,11 @@ info['created_at'] = dateutil.parser.parse(
 
 stars = fetch(info['starred_url'].replace('{/owner}{/repo}', '?page=%s&per_page=100'), True)
 template = jinja2.Template(open(os.path.join(CWD, 'report.tpl'), 'r').read())
+add_content = ''
+if os.path.isfile('content_%s.html' % user):
+    with open('content_%s.html' % user, 'r') as f:
+        add_content = f.read()
+
 print('Rendering')
 context = {
     'user': info,
@@ -165,7 +194,8 @@ context = {
     'issues': issues,
     'stars': stars,
     'timestamp': datetime.now().strftime('%H:%M %d.%m.%Y'),
-    'user_name': user
+    'user_name': user,
+    'user_content': add_content
 }
 report = template.render(context)
 
