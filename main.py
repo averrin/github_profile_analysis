@@ -11,23 +11,29 @@ from datetime import datetime, timedelta
 from dateutil import tz
 import time
 import random
-import colorsys
 
 
-def get_random_color(pastel_factor = 0.5):
-    return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0,1.0) for i in [1,2,3]]]
+def get_random_color(pastel_factor=0.5):
+    return [
+        (x + pastel_factor) / (1.0 + pastel_factor) for x in [
+            random.uniform(0, 1.0) for _ in [1, 2, 3]
+        ]
+    ]
 
-def color_distance(c1,c2):
-    return sum([abs(x[0]-x[1]) for x in zip(c1,c2)])
 
-def generate_new_color(existing_colors,pastel_factor = 0.5):
+def color_distance(c1, c2):
+    return sum([abs(x[0] - x[1]) for x in zip(c1, c2)])
+
+
+def generate_new_color(existing_colors, pastel_factor=0.5):
     max_distance = None
     best_color = None
-    for i in range(0, 100):
+    for _ in range(0, 100):
         color = get_random_color(pastel_factor=pastel_factor)
         if not existing_colors:
             return color
-        best_distance = min([color_distance(color,c) for c in existing_colors])
+        best_distance = min([color_distance(color, c)
+                             for c in existing_colors])
         if not max_distance or best_distance > max_distance:
             max_distance = best_distance
             best_color = color
@@ -48,14 +54,14 @@ colors = {}
 def td_format(td_object, v=False):
     seconds = int(td_object.total_seconds())
     periods = [
-        ('year',        60 * 60 * 24 * 365),
-        ('month',       60 * 60 * 24 * 30),
-        ('day',         60 * 60 * 24),
+        ('year', 60 * 60 * 24 * 365),
+        ('month', 60 * 60 * 24 * 30),
+        ('day', 60 * 60 * 24),
     ]
     if v:
         periods.extend([
-            ('hour',        60 * 60),
-            ('minute',      60),
+            ('hour', 60 * 60),
+            ('minute', 60),
             # ('second',      1)
         ])
 
@@ -69,6 +75,7 @@ def td_format(td_object, v=False):
                 strings.append("%s %ss" % (period_value, period_name))
 
     return ", ".join(strings)
+
 
 def fetch(_url, paginate=False, getter=None):
     print('Fetching: ' + _url)
@@ -86,11 +93,13 @@ def fetch(_url, paginate=False, getter=None):
         items = getter(items)
     if paginate and len(items) == 100:
         p += 1
-        new_items = requests.get(_url % p, auth=HTTPBasicAuth(login, token)).json()
+        new_items = requests.get(
+            _url % p, auth=HTTPBasicAuth(login, token)).json()
         items.extend(new_items)
         while new_items:
             p += 1
-            new_items = requests.get(_url % p, auth=HTTPBasicAuth(login, token)).json()
+            new_items = requests.get(
+                _url % p, auth=HTTPBasicAuth(login, token)).json()
             items.extend(new_items)
 
     cache[_url] = {
@@ -99,10 +108,9 @@ def fetch(_url, paginate=False, getter=None):
     }
     return items
 
-# TODO: repos/pr lang and value analysis
-
 info = fetch('https://api.github.com/users/%s' % user)
-_issues = fetch('https://api.github.com/search/issues?q=author:%s&page=%%s&per_page=100' % user, True, lambda x: x['items'])
+_issues = fetch('https://api.github.com/search/issues?q=author:%s&page=%%s&per_page=100' %
+                user, True, lambda x: x['items'])
 issues = [x for x in _issues if user not in x[
     'url'] and 'pull_request' not in x]
 _pulls = [x for x in _issues if 'pull_request' in x]
@@ -141,17 +149,18 @@ for repo in _repos:
         colors[l] = c
         repos['_languages'][l] = [0, 0, c]
     repos['_languages'][l][0] += 1
-    repos['_languages'][l][1] = '%s%%' % int(repos['_languages'][l][0] / (len(_repos) - repos['forks']) * 100)
-repos['languages'] = sorted(repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
+    repos['_languages'][l][1] = '%s%%' % int(
+        repos['_languages'][l][0] / (len(_repos) - repos['forks']) * 100)
+repos['languages'] = sorted(
+    repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
 for r in repos['languages']:
-    r[1][2] = '#%02X%02X%02X' % tuple([x*255.0 for x in r[1][2]])
+    r[1][2] = '#%02X%02X%02X' % tuple([x * 255.0 for x in r[1][2]])
 repos['language_names'] = [x[0] for x in repos['languages']]
 
 repos['pulls'].extend(pulls)
 repos['pulls_merged'] = len(
     [x for x in repos['pulls'] if x['info']['merged_at'] is not None])
 for pr in repos['pulls']:
-  #print(json.dumps(pr, indent=4))
     l = pr['info']['base']['repo']['language']
     repos['pr_info']['commits'] += pr['info']['commits']
     repos['pr_info']['additions'] += pr['info']['additions']
@@ -160,19 +169,25 @@ for pr in repos['pulls']:
     if l is None:
         l = 'Unknown'
     if l not in repos['_pulls_languages']:
-        repos['_pulls_languages'][l] = [0, 0, colors.get(l, generate_new_color(colors.values(), pastel_factor=0.5))]
+        repos['_pulls_languages'][l] = [
+            0, 0, colors.get(l, generate_new_color(colors.values(), pastel_factor=0.5))]
     repos['_pulls_languages'][l][0] += 1
-    repos['_pulls_languages'][l][1] = '%s%%' % int(repos['_pulls_languages'][l][0] / len(repos['pulls']) * 100)
-repos['pulls_languages'] = sorted(repos['_pulls_languages'].items(), key=lambda x: x[1][0], reverse=True)
+    repos['_pulls_languages'][l][1] = '%s%%' % int(
+        repos['_pulls_languages'][l][0] / len(repos['pulls']) * 100)
+repos['pulls_languages'] = sorted(
+    repos['_pulls_languages'].items(), key=lambda x: x[1][0], reverse=True)
 for pr in repos['pulls_languages']:
-    pr[1][2] = '#%02X%02X%02X' % tuple([x*255.0 for x in pr[1][2]])
+    pr[1][2] = '#%02X%02X%02X' % tuple([x * 255.0 for x in pr[1][2]])
 repos['pulls_language_names'] = [x[0] for x in repos['pulls_languages']]
 
 events = fetch(info['events_url'].replace('{/privacy}', ''))
 info['last_activity'] = dateutil.parser.parse(
     [x for x in events if x['actor']['login'] == user][0]['created_at']
 )
-info['last_activity'] = info['last_activity'].strftime('%d.%m.%Y') + ' (%s ago)' % td_format((datetime.now().replace(tzinfo=to_zone) - info['last_activity']), True)
+info['last_activity'] = info['last_activity'].strftime('%d.%m.%Y') +\
+    ' (%s ago)' % td_format(
+        (datetime.now().replace(tzinfo=to_zone) - info['last_activity']
+    ), True)
 info['duration'] = td_format(datetime.now().replace(tzinfo=to_zone) - dateutil.parser.parse(
     info['created_at']
 ).replace(tzinfo=to_zone))
@@ -180,7 +195,8 @@ info['created_at'] = dateutil.parser.parse(
     info['created_at']
 ).replace(tzinfo=to_zone).strftime('%d.%m.%Y')
 
-stars = fetch(info['starred_url'].replace('{/owner}{/repo}', '?page=%s&per_page=100'), True)
+stars = fetch(info['starred_url'].replace(
+    '{/owner}{/repo}', '?page=%s&per_page=100'), True)
 template = jinja2.Template(open(os.path.join(CWD, 'report.tpl'), 'r').read())
 add_content = ''
 if os.path.isfile('content_%s.html' % user):
