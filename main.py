@@ -8,11 +8,13 @@ import dateutil.parser
 from creds import login, token
 import json
 from datetime import datetime, timedelta
+from dateutil import tz
 import time
 import random
 r = lambda: random.randint(0,255)
 
 CWD = os.path.abspath(os.path.split(sys.argv[0])[0])
+to_zone = tz.tzlocal()
 
 user = sys.argv[1]
 if not os.path.isfile('cache.json'):
@@ -142,15 +144,14 @@ repos['pulls_language_names'] = [x[0] for x in repos['pulls_languages']]
 events = fetch(info['events_url'].replace('{/privacy}', ''))
 info['last_activity'] = dateutil.parser.parse(
     [x for x in events if x['actor']['login'] == user][0]['created_at']
-).replace(tzinfo=None)
-print(datetime.now() - info['last_activity'], td_format(datetime.now() - info['last_activity']))
-info['last_activity'] = info['last_activity'].strftime('%d.%m.%Y') + ' (%s ago)' % td_format((datetime.now() - info['last_activity']), True)
-info['duration'] = td_format(datetime.now() - dateutil.parser.parse(
+)
+info['last_activity'] = info['last_activity'].strftime('%d.%m.%Y') + ' (%s ago)' % td_format((datetime.now().replace(tzinfo=to_zone) - info['last_activity']), True)
+info['duration'] = td_format(datetime.now().replace(tzinfo=to_zone) - dateutil.parser.parse(
     info['created_at']
-).replace(tzinfo=None))
+).replace(tzinfo=to_zone))
 info['created_at'] = dateutil.parser.parse(
     info['created_at']
-).strftime('%d.%m.%Y')
+).replace(tzinfo=to_zone).strftime('%d.%m.%Y')
 
 stars = fetch(info['starred_url'].replace('{/owner}{/repo}', '?page=%s&per_page=100'), True)
 template = jinja2.Template(open(os.path.join(CWD, 'report.tpl'), 'r').read())
