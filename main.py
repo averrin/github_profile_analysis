@@ -8,9 +8,16 @@ import dateutil.parser
 from creds import login, token
 import json
 from datetime import datetime, timedelta
+import time
+import random
+r = lambda: random.randint(0,255)
+
 CWD = os.path.abspath(os.path.split(sys.argv[0])[0])
 
 user = sys.argv[1]
+if not os.path.isfile('cache.json'):
+    json.dump({}, open('cache.json', 'w'))
+cache = json.load(open('cache.json', 'r'))
 
 
 def td_format(td_object):
@@ -37,6 +44,10 @@ def td_format(td_object):
 
 def fetch(_url, paginate=False, getter=None):
     print('Fetching: ' + _url)
+    if _url in cache:
+        if datetime.fromtimestamp(cache[_url]['timestamp']) - datetime.now() < timedelta(hours=1):
+            print('From cache')
+            return cache[_url]['content']
     p = 1
     if paginate:
         url = _url % p
@@ -53,6 +64,11 @@ def fetch(_url, paginate=False, getter=None):
             p += 1
             new_items = requests.get(_url % p, auth=HTTPBasicAuth(login, token)).json()
             items.extend(new_items)
+
+    cache[_url] = {
+        "content": items,
+        "timestamp": time.mktime(datetime.now().timetuple())
+    }
     return items
 
 # TODO: repos/pr lang and value analysis
@@ -78,7 +94,7 @@ for repo in _repos:
     if l is None:
         l = 'Unknown'
     if l not in repos['_languages']:
-        repos['_languages'][l] = [0, 0]
+        repos['_languages'][l] = [0, 0, '#%02X%02X%02X' % (r(),r(),r())]
     repos['_languages'][l][0] += 1
     repos['_languages'][l][1] = '%s%%' % int(repos['_languages'][l][0] / len(_repos) * 100)
 repos['languages'] = sorted(repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
@@ -92,7 +108,7 @@ for pr in repos['pulls']:
     if l is None:
         l = 'Unknown'
     if l not in repos['_pulls_languages']:
-        repos['_pulls_languages'][l] = [0, 0]
+        repos['_pulls_languages'][l] = [0, 0, '#%02X%02X%02X' % (r(),r(),r())]
     repos['_pulls_languages'][l][0] += 1
     repos['_pulls_languages'][l][1] = '%s%%' % int(repos['_pulls_languages'][l][0] / len(_repos) * 100)
 repos['pulls_languages'] = sorted(repos['_pulls_languages'].items(), key=lambda x: x[1][0], reverse=True)
@@ -122,6 +138,7 @@ report = template.render(context)
 
 report_file = 'report.html'
 
+json.dump(cache, open('cache.json', 'w'))
 with open(report_file, 'w') as f:
     f.write(report)
 #context['timestamp'] = ''

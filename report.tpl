@@ -8,6 +8,23 @@
   <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <title>Github profile: {{user.name}} [{{user.login}}]</title>
+
+  <style media="screen">
+  .langs {
+    display: table;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-user-select: none;
+    height: 15px;
+  }
+  .langs span {
+    display: table-cell;
+    line-height: 8px;
+  }
+
+  </style>
 </head>
 
 <body>
@@ -23,13 +40,25 @@
           <li>Joined: {{user.created_at}} ({{user.duration}})</li>
           <li>Last activity: {{user.last_activity}}</li>
           <li>Repos: {{user.public_repos}} (Forks: {{repos.forks}})</li>
-          <li>Repos Languages:<ul>
+          <li>Repos Languages:
+            <div class="langs">
+              {% for l in repos.languages %}
+                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}"></span>
+              {%endfor%}
+            </div>
+            <ul>
             {% for l in repos.languages %}
             <li>{{l[0]}}: {{l[1][0]}} repos ({{l[1][1]}})</li>
             {%endfor%}
           </ul></li>
           <li>Pull requests: {{repos.pulls|length}} (Merged: {{repos.pulls_merged}})</li>
-          <li>Pulls Languages:<ul>
+          <li>Pulls Languages:
+            <div class="langs">
+              {% for l in repos.pulls_languages %}
+                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}"></span>
+              {%endfor%}
+            </div>
+            <ul>
             {% for l in repos.pulls_languages %}
             <li>{{l[0]}}: {{l[1][0]}} repos ({{l[1][1]}})</li>
             {%endfor%}
