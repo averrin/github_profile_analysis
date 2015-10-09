@@ -15,7 +15,7 @@
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
-    cursor: pointer;
+    /*cursor: pointer;*/
     -webkit-user-select: none;
     height: 15px;
   }
@@ -52,7 +52,7 @@
           <li><b>Repos Languages (w/ forks):</b>
             <div class="langs">
               {% for l in repos.languages %}
-                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}"></span>
+                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" title="{{l[0]}}"></span>
               {%endfor%}
             </div>
             <ul>
@@ -68,12 +68,12 @@
           <li><b>Pulls Languages:</b>
             <div class="langs">
               {% for l in repos.pulls_languages %}
-                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}"></span>
+                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" title="{{l[0]}}"></span>
               {%endfor%}
             </div>
             <ul>
             {% for l in repos.pulls_languages %}
-            <li>{{l[0]}}: {{l[1][0]}} repos ({{l[1][1]}})</li>
+            <li>{{l[0]}}: {{l[1][0]}} PRs ({{l[1][1]}})</li>
             {%endfor%}
           </ul></li>
           <li><b>Issues in foregin repos:</b> {{issues|length}}</li>

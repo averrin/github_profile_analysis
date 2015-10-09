@@ -16,8 +16,10 @@ CWD = os.path.abspath(os.path.split(sys.argv[0])[0])
 
 user = sys.argv[1]
 if not os.path.isfile('cache.json'):
-    json.dump({}, open('cache.json', 'w'))
+    json.dump({"user": user}, open('cache.json', 'w'))
 cache = json.load(open('cache.json', 'r'))
+if cache['user'] != user:
+    cache = {"user": user}
 colors = {}
 
 
