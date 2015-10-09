@@ -18,6 +18,7 @@ user = sys.argv[1]
 if not os.path.isfile('cache.json'):
     json.dump({}, open('cache.json', 'w'))
 cache = json.load(open('cache.json', 'r'))
+colors = {}
 
 
 def td_format(td_object):
@@ -86,15 +87,29 @@ repos = {
     'items': _repos,
     'forks': len([x for x in _repos if x['fork']]),
     'pulls': [],
+    'pr_info': {
+        'commits': 0,
+        'additions': 0,
+        'deletions': 0,
+        'changed_files': 0,
+    },
     '_languages': {},
     '_pulls_languages': {},
+    'stars': 0,
+    'watchers': 0
 }
 for repo in _repos:
+    if repo['fork']:
+        continue
     l = repo['language']
+    repos['stars'] += repo['stargazers_count']
+    repos['watchers'] += repo['watchers']
     if l is None:
         l = 'Unknown'
     if l not in repos['_languages']:
-        repos['_languages'][l] = [0, 0, '#%02X%02X%02X' % (r(),r(),r())]
+        c = '#%02X%02X%02X' % (r(),r(),r())
+        colors[l] = c
+        repos['_languages'][l] = [0, 0, c]
     repos['_languages'][l][0] += 1
     repos['_languages'][l][1] = '%s%%' % int(repos['_languages'][l][0] / len(_repos) * 100)
 repos['languages'] = sorted(repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
@@ -105,10 +120,14 @@ repos['pulls_merged'] = len(
 for pr in repos['pulls']:
   #print(json.dumps(pr, indent=4))
     l = pr['info']['base']['repo']['language']
+    repos['pr_info']['commits'] += pr['info']['commits']
+    repos['pr_info']['additions'] += pr['info']['additions']
+    repos['pr_info']['deletions'] += pr['info']['deletions']
+    repos['pr_info']['changed_files'] += pr['info']['changed_files']
     if l is None:
         l = 'Unknown'
     if l not in repos['_pulls_languages']:
-        repos['_pulls_languages'][l] = [0, 0, '#%02X%02X%02X' % (r(),r(),r())]
+        repos['_pulls_languages'][l] = [0, 0, colors.get(l, '#%02X%02X%02X' % (r(),r(),r()))]
     repos['_pulls_languages'][l][0] += 1
     repos['_pulls_languages'][l][1] = '%s%%' % int(repos['_pulls_languages'][l][0] / len(_repos) * 100)
 repos['pulls_languages'] = sorted(repos['_pulls_languages'].items(), key=lambda x: x[1][0], reverse=True)

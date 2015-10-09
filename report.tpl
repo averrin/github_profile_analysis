@@ -23,6 +23,12 @@
     display: table-cell;
     line-height: 8px;
   }
+  .mdl-card__title {
+    padding-bottom: 0;
+  }
+  .mdl-card__supporting-text {
+    padding-top: 0;
+  }
 
   </style>
 </head>
@@ -37,22 +43,27 @@
       </div>
       <div class="mdl-card__supporting-text">
         <ul>
-          <li>Joined: {{user.created_at}} ({{user.duration}})</li>
-          <li>Last activity: {{user.last_activity}}</li>
-          <li>Repos: {{user.public_repos}} (Forks: {{repos.forks}})</li>
-          <li>Repos Languages:
+          <li><b>Joined:</b> {{user.created_at}} ({{user.duration}})</li>
+          <li><b>Last activity:</b> {{user.last_activity}}</li>
+          <li><b>Repos:</b> {{user.public_repos}} (Forks: {{repos.forks}})</li>
+          <li><b>Repos stats:</b> {{repos.stars}} stars, {{repos.watchers}} watchers</li>
+          <li><b>Repos Languages (w/ forks):</b>
             <div class="langs">
               {% for l in repos.languages %}
                 <span style="width: {{l[1][1]}}; background: {{l[1][2]}}"></span>
               {%endfor%}
             </div>
             <ul>
-            {% for l in repos.languages %}
+            {% for l in repos.languages[:5] %}
             <li>{{l[0]}}: {{l[1][0]}} repos ({{l[1][1]}})</li>
             {%endfor%}
+            {% if repos.languages|length > 6 %}
+              <li>Others...</li>
+            {%endif%}
           </ul></li>
-          <li>Pull requests: {{repos.pulls|length}} (Merged: {{repos.pulls_merged}})</li>
-          <li>Pulls Languages:
+          <li><b>Pull requests:</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)</li>
+          <li><b>PR stats:</b> {{repos.pr_info.commits}} commits, {{repos.pr_info.additions}} additions, {{repos.pr_info.deletions}} deletions, {{repos.pr_info.changed_files}} changed files</li>
+          <li><b>Pulls Languages:</b>
             <div class="langs">
               {% for l in repos.pulls_languages %}
                 <span style="width: {{l[1][1]}}; background: {{l[1][2]}}"></span>
@@ -63,8 +74,8 @@
             <li>{{l[0]}}: {{l[1][0]}} repos ({{l[1][1]}})</li>
             {%endfor%}
           </ul></li>
-          <li>Issues in foregin repos: {{issues|length}}</li>
-          <li>Stars: {{stars|length}}</li>
+          <li><b>Issues in foregin repos:</b> {{issues|length}}</li>
+          <li><b>Starred repos:</b> {{stars|length}}</li>
         </ul>
       </div>
       <div class="mdl-card__actions mdl-card--border">
