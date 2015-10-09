@@ -151,7 +151,7 @@ context = {
     'repos': repos,
     'issues': issues,
     'stars': stars,
-    'timestamp': datetime.now(),
+    'timestamp': datetime.now().strftime('%H:%M %d.%m.%Y'),
     'user_name': user
 }
 report = template.render(context)
@@ -161,5 +161,3 @@ report_file = 'report.html'
 json.dump(cache, open('cache.json', 'w'))
 with open(report_file, 'w') as f:
     f.write(report)
-#context['timestamp'] = ''
-#json.dump(context, open('info.json', 'w'))

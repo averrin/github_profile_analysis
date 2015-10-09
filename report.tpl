@@ -34,10 +34,12 @@
 </head>
 
 <body>
-  <div class="" style="width: 400px; margin: 40px auto;">
-    <div class="github-card" data-github="{{user_name}}" data-width="400" data-height="316" data-theme="medium"></div>
-    <script src="https://cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
-    <div class="demo-card-wide mdl-card mdl-shadow--2dp" style="width: 400px; margin-top: 20px">
+  <div class="" style="width: 808px; margin: 0 auto; padding-top: 20px;">
+    <div style="width: 400px; float: left; margin-right: 8px">
+      <div class="github-card" data-github="{{user_name}}" data-width="400" data-height="316" data-theme="medium"></div>
+      <script src="https://cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
+    </div>
+    <div class="demo-card-wide mdl-card mdl-shadow--2dp" style="width: 400px;">
       <div class="mdl-card__title">
         <h3 class="mdl-card__title-text">Github Info</h3>
       </div>
