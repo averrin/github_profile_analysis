@@ -48,7 +48,7 @@
           <li><b>Joined:</b> {{user.created_at}} ({{user.duration}})</li>
           <li><b>Last activity:</b> {{user.last_activity}}</li>
           <li><b>Repositories:</b> {{user.public_repos}} (Forks: {{repos.forks}})</li>
-          <li><b>Repos stats:</b> {{repos.stars}} stars, {{repos.watchers}} watchers</li>
+          <li><b>Repos stats (w/ forks):</b> {{repos.stars}} stars, {{repos.watchers}} watchers</li>
           <li><b>Repos languages (w/ forks):</b>
             <div class="langs">
               {% for l in repos.languages %}
@@ -63,7 +63,7 @@
               <li><b>Rest:</b> {{repos.language_names[5:]|join(', ')}}</li>
             {%endif%}
           </ul></li>
-          <li><b>Pull requests:</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)</li>
+          <li><b>Pull requests (w/ own repos):</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)</li>
           <li><b>PR stats:</b> {{repos.pr_info.commits}} commits, {{repos.pr_info.additions}} additions, {{repos.pr_info.deletions}} deletions, {{repos.pr_info.changed_files}} changed files</li>
           <li><b>PR languages:</b>
             <div class="langs">
