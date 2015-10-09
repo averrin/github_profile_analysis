@@ -35,7 +35,7 @@
 
 <body>
   <div class="" style="width: 400px; margin: 40px auto;">
-    <div class="github-card" data-github="{{user.name}}" data-width="400" data-height="316" data-theme="medium"></div>
+    <div class="github-card" data-github="{{user_name}}" data-width="400" data-height="316" data-theme="medium"></div>
     <script src="https://cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
     <div class="demo-card-wide mdl-card mdl-shadow--2dp" style="width: 400px; margin-top: 20px">
       <div class="mdl-card__title">

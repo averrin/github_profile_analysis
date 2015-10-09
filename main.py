@@ -111,7 +111,7 @@ for repo in _repos:
         colors[l] = c
         repos['_languages'][l] = [0, 0, c]
     repos['_languages'][l][0] += 1
-    repos['_languages'][l][1] = '%s%%' % int(repos['_languages'][l][0] / len(_repos) * 100)
+    repos['_languages'][l][1] = '%s%%' % int(repos['_languages'][l][0] / (len(_repos) - repos['forks']) * 100)
 repos['languages'] = sorted(repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
 
 repos['pulls'].extend(pulls)
@@ -129,7 +129,7 @@ for pr in repos['pulls']:
     if l not in repos['_pulls_languages']:
         repos['_pulls_languages'][l] = [0, 0, colors.get(l, '#%02X%02X%02X' % (r(),r(),r()))]
     repos['_pulls_languages'][l][0] += 1
-    repos['_pulls_languages'][l][1] = '%s%%' % int(repos['_pulls_languages'][l][0] / len(_repos) * 100)
+    repos['_pulls_languages'][l][1] = '%s%%' % int(repos['_pulls_languages'][l][0] / len(repos['pulls']) * 100)
 repos['pulls_languages'] = sorted(repos['_pulls_languages'].items(), key=lambda x: x[1][0], reverse=True)
 
 events = fetch(info['events_url'].replace('{/privacy}', ''))
@@ -151,7 +151,8 @@ context = {
     'repos': repos,
     'issues': issues,
     'stars': stars,
-    'timestamp': datetime.now()
+    'timestamp': datetime.now(),
+    'user_name': user
 }
 report = template.render(context)
 
