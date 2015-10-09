@@ -85,9 +85,12 @@ info = fetch('https://api.github.com/users/%s' % user)
 _issues = fetch('https://api.github.com/search/issues?q=author:%s&page=%%s&per_page=100' % user, True, lambda x: x['items'])
 issues = [x for x in _issues if user not in x[
     'url'] and 'pull_request' not in x]
-pulls = [x for x in _issues if 'pull_request' in x]
-for p in pulls:
+_pulls = [x for x in _issues if 'pull_request' in x]
+pulls = []
+for p in _pulls:
     p['info'] = fetch(p['pull_request']['url'])
+    if p['info']['base']['repo']['owner']['login'] != user:
+        pulls.append(p)
 
 _repos = fetch(info['repos_url'] + '?page=%s&per_page=1000', True)
 repos = {
