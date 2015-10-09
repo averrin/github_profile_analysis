@@ -57,10 +57,10 @@
             </div>
             <ul>
             {% for l in repos.languages[:5] %}
-            <li>{{l[0]}}: {{l[1][0]}} repos ({{l[1][1]}})</li>
+            <li><b>{{l[0]}}:</b> {{l[1][0]}} repos ({{l[1][1]}})</li>
             {%endfor%}
             {% if repos.languages|length > 6 %}
-              <li>Others...</li>
+              <li><b>Rest:</b> {{repos.language_names[5:]|join(', ')}}</li>
             {%endif%}
           </ul></li>
           <li><b>Pull requests:</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)</li>
@@ -72,9 +72,12 @@
               {%endfor%}
             </div>
             <ul>
-            {% for l in repos.pulls_languages %}
-            <li>{{l[0]}}: {{l[1][0]}} PRs ({{l[1][1]}})</li>
+            {% for l in repos.pulls_languages[:5] %}
+            <li><b>{{l[0]}}:</b> {{l[1][0]}} PRs ({{l[1][1]}})</li>
             {%endfor%}
+            {% if repos.pulls_languages|length > 6 %}
+              <li><b>Rest:</b> {{repos.pulls_language_names[5:]|join(', ')}}</li>
+            {%endif%}
           </ul></li>
           <li><b>Issues in foregin repos:</b> {{issues|length}}</li>
           <li><b>Starred repos:</b> {{stars|length}}</li>

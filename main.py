@@ -23,16 +23,19 @@ if cache['user'] != user:
 colors = {}
 
 
-def td_format(td_object):
+def td_format(td_object, v=False):
     seconds = int(td_object.total_seconds())
     periods = [
         ('year',        60 * 60 * 24 * 365),
         ('month',       60 * 60 * 24 * 30),
         ('day',         60 * 60 * 24),
-        # ('hour',        60 * 60),
-        # ('minute',      60),
-        # ('second',      1)
     ]
+    if v:
+        periods.extend([
+            ('hour',        60 * 60),
+            ('minute',      60),
+            # ('second',      1)
+        ])
 
     strings = []
     for period_name, period_seconds in periods:
@@ -115,6 +118,7 @@ for repo in _repos:
     repos['_languages'][l][0] += 1
     repos['_languages'][l][1] = '%s%%' % int(repos['_languages'][l][0] / (len(_repos) - repos['forks']) * 100)
 repos['languages'] = sorted(repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
+repos['language_names'] = [x[0] for x in repos['languages']]
 
 repos['pulls'].extend(pulls)
 repos['pulls_merged'] = len(
@@ -133,11 +137,14 @@ for pr in repos['pulls']:
     repos['_pulls_languages'][l][0] += 1
     repos['_pulls_languages'][l][1] = '%s%%' % int(repos['_pulls_languages'][l][0] / len(repos['pulls']) * 100)
 repos['pulls_languages'] = sorted(repos['_pulls_languages'].items(), key=lambda x: x[1][0], reverse=True)
+repos['pulls_language_names'] = [x[0] for x in repos['pulls_languages']]
 
 events = fetch(info['events_url'].replace('{/privacy}', ''))
 info['last_activity'] = dateutil.parser.parse(
     [x for x in events if x['actor']['login'] == user][0]['created_at']
-).strftime('%d.%m.%Y')
+).replace(tzinfo=None)
+print(datetime.now() - info['last_activity'], td_format(datetime.now() - info['last_activity']))
+info['last_activity'] = info['last_activity'].strftime('%d.%m.%Y') + ' (%s ago)' % td_format((datetime.now() - info['last_activity']), True)
 info['duration'] = td_format(datetime.now() - dateutil.parser.parse(
     info['created_at']
 ).replace(tzinfo=None))
