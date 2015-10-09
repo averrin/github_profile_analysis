@@ -29,17 +29,30 @@
   .mdl-card__supporting-text {
     padding-top: 0;
   }
+  .container {
+    width: 808px;
+    margin: 0 auto;
+    padding-top: 20px;
+  }
+  .mdl-card {
+    width: 400px;
+  }
+  .card-holder {
+    width: 400px;
+    float: left;
+    margin-right: 8px;
+  }
 
   </style>
 </head>
 
 <body>
-  <div class="" style="width: 808px; margin: 0 auto; padding-top: 20px;">
-    <div style="width: 400px; float: left; margin-right: 8px">
+  <div class="container">
+    <div class="card-holder">
       <div class="github-card" data-github="{{user_name}}" data-width="400" data-height="316" data-theme="medium"></div>
       <script src="https://cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
     </div>
-    <div class="demo-card-wide mdl-card mdl-shadow--2dp" style="width: 400px;">
+    <div class="demo-card-wide mdl-card mdl-shadow--2dp">
       <div class="mdl-card__title">
         <h3 class="mdl-card__title-text">Github Info</h3>
       </div>
@@ -57,7 +70,7 @@
             </div>
             <ul>
             {% for l in repos.languages[:5] %}
-            <li><b>{{l[0]}}:</b> {{l[1][0]}} repos ({{l[1][1]}})</li>
+              <li><b>{{l[0]}}:</b> {{l[1][0]}} repos ({{l[1][1]}})</li>
             {%endfor%}
             {% if repos.languages|length > 6 %}
               <li><b>Rest:</b> {{repos.language_names[5:]|join(', ')}}</li>
@@ -73,7 +86,7 @@
             </div>
             <ul>
             {% for l in repos.pulls_languages[:5] %}
-            <li><b>{{l[0]}}:</b> {{l[1][0]}} PRs ({{l[1][1]}})</li>
+              <li><b>{{l[0]}}:</b> {{l[1][0]}} PRs ({{l[1][1]}})</li>
             {%endfor%}
             {% if repos.pulls_languages|length > 6 %}
               <li><b>Rest:</b> {{repos.pulls_language_names[5:]|join(', ')}}</li>
