@@ -10,6 +10,9 @@
   <title>Github profile: {{user.name}} [{{user.login}}]</title>
 
   <style media="screen">
+    body {
+      background: #111;
+    }
     .langs {
       display: table;
       width: 100%;
@@ -23,6 +26,11 @@
     .langs span {
       display: table-cell;
       line-height: 8px;
+      margin: 0;
+      font-weight: bold;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 8pt;
     }
 
     .mdl-card__title {
@@ -80,7 +88,8 @@
             <li><b>Repos languages (w/ forks):</b>
               <div class="langs">
                 {% for l in repos.languages %}
-                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" title="{{l[0]}}"></span>
+                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="repo_{{l[0]}}" title="{{l[0]}}"></span>
+                <div class="mdl-tooltip" for="repo_{{l[0]}}">{{l[0]}} ({{l[1][1]}})</div>
                 {%endfor%}
               </div>
               <ul>
@@ -91,12 +100,20 @@
                 {%endif%}
               </ul>
             </li>
-            <li><b>Pull requests (w/ own repos):</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)</li>
+            <li><b>Pull requests (w/ own repos):</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)
+              <div class="langs">
+                <span style="width: {{repos.pulls_unmerged_per}}; background: #ccc; color: #111" id="unmerged">{{repos.pulls_unmerged_per}}</span>
+                <div class="mdl-tooltip" for="unmerged">unmerged</div>
+                <span style="width: {{repos.pulls_merged_per}}; background: #6e5494; color: #ccc" id="merged">{{repos.pulls_merged_per}}</span>
+                <div class="mdl-tooltip" for="merged">merged</div>
+              </div>
+            </li>
             <li><b>PR stats:</b> {{repos.pr_info.commits}} commits, {{repos.pr_info.additions}} additions, {{repos.pr_info.deletions}} deletions, {{repos.pr_info.changed_files}} changed files</li>
             <li><b>PR languages:</b>
               <div class="langs">
                 {% for l in repos.pulls_languages %}
-                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" title="{{l[0]}}"></span>
+                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="pr_{{l[0]}}" title="{{l[0]}}"></span>
+                <div class="mdl-tooltip" for="pr_{{l[0]}}">{{l[0]}} ({{l[1][1]}})</div>
                 {%endfor%}
               </div>
               <ul>
