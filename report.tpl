@@ -104,7 +104,7 @@
               <div class="langs">
                 <span style="width: {{repos.pulls_unmerged_per}}; background: #ccc; color: #111" id="unmerged">{{repos.pulls_unmerged_per}}</span>
                 <div class="mdl-tooltip" for="unmerged">unmerged</div>
-                <span style="width: {{repos.pulls_merged_per}}; background: #6e5494; color: #ccc" id="merged">{{repos.pulls_merged_per}}</span>
+                <span style="width: {{repos.pulls_merged_per}}; background: #6e5494; color: #eee" id="merged">{{repos.pulls_merged_per}}</span>
                 <div class="mdl-tooltip" for="merged">merged</div>
               </div>
             </li>
