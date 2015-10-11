@@ -7,58 +7,12 @@
   <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
   <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <title>Github profile: {{user.name}} [{{user.login}}]</title>
+  <link href='https://fonts.googleapis.com/css?family=Ubuntu:300,400,600,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+  <link href="{{user.avatar_url}}" rel="shortcut icon">
+  <link rel="stylesheet" href="style.css">
+  <title>{{user.name}}'s Profile</title>
 
-  <style media="screen">
-    body {
-      background: #111;
-    }
-    .langs {
-      display: table;
-      width: 100%;
-      overflow: hidden;
-      white-space: nowrap;
-      /*cursor: pointer;*/
-      -webkit-user-select: none;
-      height: 15px;
-    }
-
-    .langs span {
-      display: table-cell;
-      line-height: 8px;
-      margin: 0;
-      font-weight: bold;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 8pt;
-    }
-
-    .mdl-card__title {
-      padding-bottom: 0;
-    }
-
-    .mdl-card__supporting-text {
-      padding-top: 0;
-    }
-
-    .container {
-      width: 808px;
-      margin: 0 auto;
-      padding-top: 20px;
-    }
-
-    .mdl-card {
-      width: 100%;
-    }
-
-    .card-holder {
-      width: 100%;
-      float: left;
-    }
-    .mdl-cell--6-col {
-      margin-right: 8px;
-    }
-  </style>
 </head>
 
 <body>
@@ -68,9 +22,20 @@
   </a>
   <div class="container mdl-grid">
     <div class="mdl-cell--6-col">
-      <div class="card-holder mdl-cell">
-        <div class="github-card" data-github="{{user_name}}" data-width="400" data-height="316" data-theme="medium"></div>
-        <script src="https://cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
+      <div class="mdl-card mdl-shadow--2dp mdl-cell">
+        <img src="{{user.avatar_url}}" alt="" style="width: 120px; position: absolute">
+        <div class="card-content">
+          <h4>{% if user.name%}{{user.name}}{%else%}{{user.name}}{%endif%}</h4>
+          <ul class="status">
+            <li><a href="https://github.com/{{user_name}}?tab=repositories" target="_top"><strong>{{user.public_repos}}</strong>Repos</a></li>
+            <li><a href="https://gist.github.com/{{user_name}}" target="_top"><strong>{{user.public_gists}}</strong>Gists</a></li>
+            <li><a href="https://github.com/{{user_name}}/followers" target="_top"><strong>{{user.followers}}</strong>Followers</a></li>
+          </ul>
+        </div>
+        <ul>
+            <li><b>Joined:</b> {{user.created_at}} ({{user.duration}})</li>
+            <li><b>Last activity:</b> {{user.last_activity}}</li>
+        </ul>
       </div>
       {% if user_content%} {{user_content}} {%endif%}
     </div>
@@ -81,15 +46,19 @@
         </div>
         <div class="mdl-card__supporting-text">
           <ul>
-            <li><b>Joined:</b> {{user.created_at}} ({{user.duration}})</li>
-            <li><b>Last activity:</b> {{user.last_activity}}</li>
             <li><b>Repositories:</b> {{user.public_repos}} (Forks: {{repos.forks}})</li>
             <li><b>Repos stats (w/ forks):</b> {{repos.stars}} stars, {{repos.watchers}} watchers</li>
             <li><b>Repos languages (w/ forks):</b>
               <div class="langs">
                 {% for l in repos.languages %}
-                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="repo_{{l[0]}}" title="{{l[0]}}"></span>
-                <div class="mdl-tooltip" for="repo_{{l[0]}}">{{l[0]}} ({{l[1][1]}})</div>
+                  <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="repo_{{l[0]}}" title="{{l[0]}}">
+                    {%if l[1][0] / (user.public_repos - repos.forks) > 0.15%}
+                      {{l[1][1]}}
+                    {%endif%}
+                  </span>
+                {%endfor%}
+                {% for l in repos.languages %}
+                  <div class="mdl-tooltip" for="repo_{{l[0]}}">{{l[0]}} ({{l[1][1]}})</div>
                 {%endfor%}
               </div>
               <ul>
@@ -103,8 +72,8 @@
             <li><b>Pull requests (w/ own repos):</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)
               <div class="langs">
                 <span style="width: {{repos.pulls_unmerged_per}}; background: #ccc; color: #111" id="unmerged">{{repos.pulls_unmerged_per}}</span>
-                <div class="mdl-tooltip" for="unmerged">unmerged</div>
                 <span style="width: {{repos.pulls_merged_per}}; background: #6e5494; color: #eee" id="merged">{{repos.pulls_merged_per}}</span>
+                <div class="mdl-tooltip" for="unmerged">unmerged</div>
                 <div class="mdl-tooltip" for="merged">merged</div>
               </div>
             </li>
@@ -112,8 +81,14 @@
             <li><b>PR languages:</b>
               <div class="langs">
                 {% for l in repos.pulls_languages %}
-                <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="pr_{{l[0]}}" title="{{l[0]}}"></span>
-                <div class="mdl-tooltip" for="pr_{{l[0]}}">{{l[0]}} ({{l[1][1]}})</div>
+                  <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="pr_{{l[0]}}" title="{{l[0]}}">
+                    {%if l[1][0] / repos.pulls|length > 0.15%}
+                      {{l[1][1]}}
+                    {%endif%}
+                  </span>
+                {%endfor%}
+                {% for l in repos.pulls_languages %}
+                  <div class="mdl-tooltip" for="pr_{{l[0]}}">{{l[0]}} ({{l[1][1]}})</div>
                 {%endfor%}
               </div>
               <ul>

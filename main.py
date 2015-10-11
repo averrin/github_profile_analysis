@@ -149,7 +149,7 @@ def retrieveRepos(info):
         if l is None:
             l = 'Unknown'
         if l not in repos['_languages']:
-            c = generate_new_color(colors.values(), pastel_factor=0.5)
+            c = generate_new_color(colors.values(), pastel_factor=0.6)
             colors[l] = c
             repos['_languages'][l] = [0, 0, c]
         repos['_languages'][l][0] += 1
@@ -179,7 +179,7 @@ def processPulls(pulls, repos):
             l = 'Unknown'
         if l not in repos['_pulls_languages']:
             repos['_pulls_languages'][l] = [
-                0, 0, colors.get(l, generate_new_color(colors.values(), pastel_factor=0.5))]
+                0, 0, colors.get(l, generate_new_color(colors.values(), pastel_factor=0.6))]
         repos['_pulls_languages'][l][0] += 1
         repos['_pulls_languages'][l][1] = '%s%%' % int(
             repos['_pulls_languages'][l][0] / len(repos['pulls']) * 100)
