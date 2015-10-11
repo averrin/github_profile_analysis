@@ -11,26 +11,32 @@
   <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
   <link href="{{user.avatar_url}}" rel="shortcut icon">
   <link rel="stylesheet" href="style.css">
-  <title>{{user.name}}'s Profile</title>
+  <title>{% if user.name%}{{user.name}}{%else%}{{user_name}}{%endif%}'s Profile</title>
 
 </head>
 
 <body>
   <a href="https://github.com/averrin/github_profile_analysis">
-    <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
+    <img style="position: absolute; top: 0; right: 0; border: 0; z-index: 100;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
     alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
   </a>
   <div class="container mdl-grid">
     <div class="mdl-cell--6-col">
       <div class="mdl-card mdl-shadow--2dp mdl-cell">
-        <img src="{{user.avatar_url}}" alt="" style="width: 120px; position: absolute">
-        <div class="card-content">
-          <h4>{% if user.name%}{{user.name}}{%else%}{{user.name}}{%endif%}</h4>
-          <ul class="status">
-            <li><a href="https://github.com/{{user_name}}?tab=repositories" target="_top"><strong>{{user.public_repos}}</strong>Repos</a></li>
-            <li><a href="https://gist.github.com/{{user_name}}" target="_top"><strong>{{user.public_gists}}</strong>Gists</a></li>
-            <li><a href="https://github.com/{{user_name}}/followers" target="_top"><strong>{{user.followers}}</strong>Followers</a></li>
-          </ul>
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--4-col mdl-cell--2-col-phone">
+            <img src="{{user.avatar_url}}" alt="{% if user.name%}{{user.name}}{%else%}{{user_name}}{%endif%}" style="width: 100%">
+          </div>
+          <div class="mdl-cell mdl-cell--8-col mdl-cell--4-col-phone">
+            <div class="card-content">
+              <h4>{% if user.name%}{{user.name}}{%else%}{{user_name}}{%endif%}</h4>
+              <ul class="status">
+                <li><a href="https://github.com/{{user_name}}?tab=repositories" target="_top"><strong>{{user.public_repos}}</strong>Repos</a></li>
+                <li><a href="https://gist.github.com/{{user_name}}" target="_top"><strong>{{user.public_gists}}</strong>Gists</a></li>
+                <li><a href="https://github.com/{{user_name}}/followers" target="_top"><strong>{{user.followers}}</strong>Followers</a></li>
+              </ul>
+            </div>
+          </div>
         </div>
         <ul>
             <li><b>Joined:</b> {{user.created_at}} ({{user.duration}})</li>
@@ -71,8 +77,8 @@
             </li>
             <li><b>Pull requests (w/ own repos):</b> {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)
               <div class="langs">
-                <span style="width: {{repos.pulls_unmerged_per}}; background: #ccc; color: #111" id="unmerged">{{repos.pulls_unmerged_per}}</span>
-                <span style="width: {{repos.pulls_merged_per}}; background: #6e5494; color: #eee" id="merged">{{repos.pulls_merged_per}}</span>
+                <span style="width: {{repos.pulls_unmerged_per}}; background: #ccc; color: #111" id="unmerged">{%if repos.pulls_unmerged%}{{repos.pulls_unmerged_per}}{%endif%}</span>
+                <span style="width: {{repos.pulls_merged_per}}; background: #6e5494; color: #eee" id="merged">{%if repos.pulls_merged%}{{repos.pulls_merged_per}}{%endif%}</span>
                 <div class="mdl-tooltip" for="unmerged">unmerged</div>
                 <div class="mdl-tooltip" for="merged">merged</div>
               </div>
