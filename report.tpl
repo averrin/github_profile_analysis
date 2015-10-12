@@ -41,6 +41,7 @@
         <ul>
             <li><b>Joined:</b> {{user.created_at}} ({{user.duration}})</li>
             <li><b>Last activity:</b> {{user.last_activity}}</li>
+            <li><b>Last pushed repo:</b> <a href="{{user.last_push.repo.url}}">{{user.last_push.repo.name}}</a></li>
         </ul>
       </div>
       {% if user_content%} {{user_content}} {%endif%}
@@ -53,11 +54,11 @@
         <div class="mdl-card__supporting-text">
           <ul>
             <li><b>Repositories:</b> {{user.public_repos}} (Forks: {{repos.forks}})</li>
-            <li><b>Repos stats (w/ forks):</b> {{repos.stars}} stars, {{repos.watchers}} watchers</li>
+            <li><b>Repos stats (w/ forks):</b> {{repos.commits}} commits, {{repos.stars}} stars, {{repos.watchers}} watchers</li>
             <li><b>Repos languages (w/ forks):</b>
               <div class="langs">
                 {% for l in repos.languages %}
-                  <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="repo_{{l[0]}}" title="{{l[0]}}">
+                  <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="repo_{{l[0]}}">
                     {%if l[1][0] / (user.public_repos - repos.forks) > 0.15%}
                       {{l[1][1]}}
                     {%endif%}
@@ -87,7 +88,7 @@
             <li><b>PR languages:</b>
               <div class="langs">
                 {% for l in repos.pulls_languages %}
-                  <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="pr_{{l[0]}}" title="{{l[0]}}">
+                  <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="pr_{{l[0]}}">
                     {%if l[1][0] / repos.pulls|length > 0.15%}
                       {{l[1][1]}}
                     {%endif%}

@@ -138,7 +138,8 @@ def retrieveRepos(info):
         '_languages': {},
         '_pulls_languages': {},
         'stars': 0,
-        'watchers': 0
+        'watchers': 0,
+        'commits': 0
     }
     for repo in _repos:
         if repo['fork']:
@@ -155,6 +156,8 @@ def retrieveRepos(info):
         repos['_languages'][l][0] += 1
         repos['_languages'][l][1] = '%s%%' % int(
             repos['_languages'][l][0] / (len(_repos) - repos['forks']) * 100)
+        commits = fetch(repo['commits_url'].replace('{/sha}', '?page=%s&per_page=1000'), True)
+        repos['commits'] += len(commits)
     repos['languages'] = sorted(
         repos['_languages'].items(), key=lambda x: x[1][0], reverse=True)
     for r in repos['languages']:
@@ -206,6 +209,8 @@ def main():
     repos = retrieveRepos(info)
     repos = processPulls(pulls, repos)
     events = fetch(info['events_url'].replace('{/privacy}', ''))
+    info['last_push'] = [x for x in events if x['type'] == 'PushEvent']
+    info['last_push'] = info['last_push'][0] if info['last_push'] else None
     info['last_activity'] = dateutil.parser.parse(
         [x for x in events if x['actor']['login'] == user][0]['created_at']
     )
