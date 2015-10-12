@@ -80,7 +80,7 @@ def td_format(td_object, v=False):
 def fetch(_url, paginate=False, getter=None):
     print('Fetching: ' + _url)
     if _url in cache:
-        if datetime.fromtimestamp(cache[_url]['timestamp']) - datetime.now() < timedelta(hours=1):
+        if datetime.now() - datetime.fromtimestamp(cache[_url]['timestamp']) < timedelta(minutes=20):
             print('From cache')
             return cache[_url]['content']
     p = 1
@@ -214,10 +214,12 @@ def main():
     info['last_activity'] = dateutil.parser.parse(
         [x for x in events if x['actor']['login'] == user][0]['created_at']
     )
-    info['last_activity'] = info['last_activity'].strftime('%d.%m.%Y') +\
-        ' (%s ago)' % td_format(
-            (datetime.now().replace(tzinfo=to_zone) - info['last_activity']
-        ), True)
+    ago = td_format(
+        (datetime.now().replace(tzinfo=to_zone) - info['last_activity']), True
+    )
+    info['last_activity'] = info['last_activity'].strftime('%d.%m.%Y')
+    if ago:
+        info['last_activity'] += ' (%s ago)' % ago
     info['duration'] = td_format(datetime.now().replace(tzinfo=to_zone) - dateutil.parser.parse(
         info['created_at']
     ).replace(tzinfo=to_zone))
