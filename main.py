@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from dateutil import tz
 import time
 import random
+import copy
 
 
 def get_random_color(pastel_factor=0.5):
@@ -82,7 +83,7 @@ def fetch(_url, paginate=False, getter=None):
     if _url in cache:
         if datetime.now() - datetime.fromtimestamp(cache[_url]['timestamp']) < timedelta(minutes=20):
             print('From cache')
-            return cache[_url]['content']
+            return copy.deepcopy(cache[_url]['content'])
     p = 1
     if paginate:
         url = _url % p
@@ -103,7 +104,7 @@ def fetch(_url, paginate=False, getter=None):
             items.extend(new_items)
 
     cache[_url] = {
-        "content": items,
+        "content": copy.deepcopy(items),
         "timestamp": time.mktime(datetime.now().timetuple())
     }
     return items
@@ -223,9 +224,11 @@ def main():
     info['duration'] = td_format(datetime.now().replace(tzinfo=to_zone) - dateutil.parser.parse(
         info['created_at']
     ).replace(tzinfo=to_zone))
+    print(info['created_at'])
     info['created_at'] = dateutil.parser.parse(
         info['created_at']
     ).replace(tzinfo=to_zone).strftime('%d.%m.%Y')
+    print(info['created_at'])
 
     stars = fetch(info['starred_url'].replace(
         '{/owner}{/repo}', '?page=%s&per_page=100'), True)
