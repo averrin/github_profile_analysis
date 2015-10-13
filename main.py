@@ -200,7 +200,7 @@ def processPulls(pulls, repos):
     repos['pulls_language_names'] = [x[0] for x in repos['pulls_languages']]
     repos['pulls_repos_count'] = len(repos['pulls_repos'].keys())
     repos['pulls_repos'] = sorted(repos['pulls_repos'].items(), key=lambda x: x[1], reverse=True)
-    repos['pulls_repos'] = ', '.join(['<a href="http://github.com/%s">%s</a> (%s)' % (x[0], x[0], x[1]) for x in repos['pulls_repos']])
+    # repos['pulls_repos'] = ', '.join(['<a href="http://github.com/%s">%s</a> (%s)' % (x[0], x[0], x[1]) for x in repos['pulls_repos']])
     return repos
 
 

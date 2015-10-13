@@ -71,7 +71,7 @@
               <ul>
                 {% for l in repos.languages[:5] %}
                 <li><b>{{l[0]}}:</b> {{l[1][0]}} repos ({{l[1][1]}})</li>
-                {%endfor%} {% if repos.languages|length > 6 %}
+                {%endfor%} {% if repos.languages|length > 5 %}
                 <li><b>Rest:</b> {{repos.language_names[5:]|join(', ')}}</li>
                 {%endif%}
               </ul>
@@ -104,12 +104,17 @@
               <ul>
                 {% for l in repos.pulls_languages[:5] %}
                 <li><b>{{l[0]}}:</b> {{l[1][0]}} PRs ({{l[1][1]}})</li>
-                {%endfor%} {% if repos.pulls_languages|length > 6 %}
+                {%endfor%} {% if repos.pulls_languages|length > 5 %}
                 <li><b>Rest:</b> {{repos.pulls_language_names[5:]|join(', ')}}</li>
                 {%endif%}
               </ul>
             </li>
-            <li><b>PR repos:</b> {{repos.pulls_repos}}</li>
+            <li><b>PR repos {% if repos.pulls_repos|length > 5 %}(top 5){%endif%}:</b><ul>
+              {% for repo in repos.pulls_repos[:5]%}
+                <li><a href="http://github.com/{{repo[0]}}">{{repo[0]}}</a> ({{repo[1]}})</li>
+              {%endfor%}
+            </ul>
+            </li>
             <li><b>Issues in foregin repos:</b> {{issues|length}}</li>
             <li><b>Starred repos:</b> {{stars|length}}</li>
           </ul>
