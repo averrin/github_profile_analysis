@@ -224,11 +224,9 @@ def main():
     info['duration'] = td_format(datetime.now().replace(tzinfo=to_zone) - dateutil.parser.parse(
         info['created_at']
     ).replace(tzinfo=to_zone))
-    print(info['created_at'])
     info['created_at'] = dateutil.parser.parse(
         info['created_at']
     ).replace(tzinfo=to_zone).strftime('%d.%m.%Y')
-    print(info['created_at'])
 
     stars = fetch(info['starred_url'].replace(
         '{/owner}{/repo}', '?page=%s&per_page=100'), True)

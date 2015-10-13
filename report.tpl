@@ -31,9 +31,9 @@
             <div class="card-content">
               <h4>{% if user.name%}{{user.name}}{%else%}{{user_name}}{%endif%}</h4>
               <ul class="status">
-                <li><a href="https://github.com/{{user_name}}?tab=repositories" target="_top"><strong>{{user.public_repos}}</strong>Repos</a></li>
+                <li><a href="{{user.repos_url}}" target="_top"><strong>{{user.public_repos}}</strong>Repos</a></li>
                 <li><a href="https://gist.github.com/{{user_name}}" target="_top"><strong>{{user.public_gists}}</strong>Gists</a></li>
-                <li><a href="https://github.com/{{user_name}}/followers" target="_top"><strong>{{user.followers}}</strong>Followers</a></li>
+                <li><a href="{{user.followers_url}}" target="_top"><strong>{{user.followers}}</strong>Followers</a></li>
               </ul>
             </div>
           </div>
@@ -41,7 +41,7 @@
         <ul>
             <li><b>Joined:</b> {{user.created_at}} ({{user.duration}})</li>
             <li><b>Last activity:</b> {{user.last_activity}}</li>
-            <li><b>Last pushed repo:</b> <a href="{{user.last_push.repo.url}}">{{user.last_push.repo.name}}</a></li>
+            <li><b>Last pushed repo:</b> <a href="https://github.com/{{user.last_push.repo.name}}">{{user.last_push.repo.name}}</a></li>
         </ul>
       </div>
       {% if user_content%} {{user_content}} {%endif%}
