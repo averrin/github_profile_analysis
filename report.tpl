@@ -84,7 +84,10 @@
                 <div class="mdl-tooltip" for="merged">merged</div>
               </div>
             </li>
-            <li><b>PR stats:</b> {{repos.pr_info.commits}} commits, {{repos.pr_info.additions}} additions, {{repos.pr_info.deletions}} deletions, {{repos.pr_info.changed_files}} changed files</li>
+            <li><b>PR stats:</b> {{repos.pr_info.commits}} commits to {{repos.pulls_repos_count}} repos,
+              {{repos.pr_info.additions}} additions,
+              {{repos.pr_info.deletions}} deletions,
+              {{repos.pr_info.changed_files}} changed files</li>
             <li><b>PR languages:</b>
               <div class="langs">
                 {% for l in repos.pulls_languages %}
@@ -106,6 +109,7 @@
                 {%endif%}
               </ul>
             </li>
+            <li><b>PR repos:</b> {{repos.pulls_repos}}</li>
             <li><b>Issues in foregin repos:</b> {{issues|length}}</li>
             <li><b>Starred repos:</b> {{stars|length}}</li>
           </ul>

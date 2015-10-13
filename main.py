@@ -173,12 +173,18 @@ def processPulls(pulls, repos):
         [x for x in repos['pulls'] if x['info']['merged_at'] is not None])
     repos['pulls_merged_per'] = '%s%%' % int(repos['pulls_merged'] / len(repos['pulls']) * 100)
     repos['pulls_unmerged_per'] = '%s%%' % int((len(repos['pulls']) - repos['pulls_merged']) / len(repos['pulls']) * 100)
+    repos['pulls_repos'] = {}
     for pr in repos['pulls']:
         l = pr['info']['base']['repo']['language']
         repos['pr_info']['commits'] += pr['info']['commits']
         repos['pr_info']['additions'] += pr['info']['additions']
         repos['pr_info']['deletions'] += pr['info']['deletions']
         repos['pr_info']['changed_files'] += pr['info']['changed_files']
+        rn = pr['info']['base']['repo']['owner']['login'] + '/' + pr['info']['base']['repo']['name']
+        if rn not in repos['pulls_repos']:
+            repos['pulls_repos'][rn] = 1
+        else:
+            repos['pulls_repos'][rn] += 1
         if l is None:
             l = 'Unknown'
         if l not in repos['_pulls_languages']:
@@ -192,6 +198,9 @@ def processPulls(pulls, repos):
     for pr in repos['pulls_languages']:
         pr[1][2] = '#%02X%02X%02X' % tuple([x * 255.0 for x in pr[1][2]])
     repos['pulls_language_names'] = [x[0] for x in repos['pulls_languages']]
+    repos['pulls_repos_count'] = len(repos['pulls_repos'].keys())
+    repos['pulls_repos'] = sorted(repos['pulls_repos'].items(), key=lambda x: x[1], reverse=True)
+    repos['pulls_repos'] = ', '.join(['<a href="http://github.com/%s">%s</a> (%s)' % (x[0], x[0], x[1]) for x in repos['pulls_repos']])
     return repos
 
 
