@@ -76,9 +76,9 @@
                 {%endif%}
               </ul>
             </li>
-            <li><b>Pull requests (w/ own repos):</b><br> Total: {{repos.pulls|length}} (Merged: <b>{{repos.pulls_merged}}</b>)
+            <li><b>Pull requests (w/ own repos):</b><br> Total: {{repos.pulls}} (Merged: <b>{{repos.pulls_merged}}</b>)
               <div class="langs">
-                <span style="width: {{repos.pulls_unmerged_per}}; background: #ccc; color: #111" id="unmerged">{%if repos.pulls|length - repos.pulls_merged%}{{repos.pulls_unmerged_per}}{%endif%}</span>
+                <span style="width: {{repos.pulls_unmerged_per}}; background: #ccc; color: #111" id="unmerged">{%if repos.pulls - repos.pulls_merged%}{{repos.pulls_unmerged_per}}{%endif%}</span>
                 <span style="width: {{repos.pulls_merged_per}}; background: #6e5494; color: #eee" id="merged">{%if repos.pulls_merged%}{{repos.pulls_merged_per}}{%endif%}</span>
                 <div class="mdl-tooltip" for="unmerged">unmerged</div>
                 <div class="mdl-tooltip" for="merged">merged</div>
@@ -92,7 +92,7 @@
               <div class="langs">
                 {% for l in repos.pulls_languages %}
                   <span style="width: {{l[1][1]}}; background: {{l[1][2]}}" id="pr_{{l[0]}}">
-                    {%if l[1][0] / repos.pulls|length > 0.15%}
+                    {%if l[1][0] / repos.pulls > 0.15%}
                       {{l[1][1]}}
                     {%endif%}
                   </span>
@@ -115,8 +115,8 @@
               {%endfor%}
             </ul>
             </li>
-            <li><b>Issues in foregin repos:</b> {{issues|length}}</li>
-            <li><b>Starred repos:</b> {{stars|length}}</li>
+            <li><b>Issues in foregin repos:</b> {{issues}}</li>
+            <li><b>Starred repos:</b> {{stars}}</li>
           </ul>
         </div>
         <div class="mdl-card__actions mdl-card--border">

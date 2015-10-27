@@ -13,6 +13,10 @@ import time
 import random
 import copy
 
+export_json = False
+if len(sys.argv) == 4 and sys.argv[2] == '--json':
+    export_json = True
+
 
 def get_random_color(pastel_factor=0.5):
     return [
@@ -218,6 +222,8 @@ def main():
     issues, pulls = retrieveIssues()
     repos = retrieveRepos(info)
     repos = processPulls(pulls, repos)
+    del repos['items']
+    repos['pulls'] = len(repos['pulls'])
     events = fetch(info['events_url'].replace('{/privacy}', ''))
     info['last_push'] = [x for x in events if x['type'] == 'PushEvent']
     info['last_push'] = info['last_push'][0] if info['last_push'] else None
@@ -247,14 +253,17 @@ def main():
     context = {
         'user': info,
         'repos': repos,
-        'issues': issues,
-        'stars': stars,
+        'issues': len(issues),
+        'stars': len(stars),
         'timestamp': datetime.now().strftime('%H:%M %d.%m.%Y'),
         'user_name': user,
         'user_content': add_content
     }
-    renderReport(context)
-    json.dump(cache, open('cache.json', 'w'))
+    if export_json:
+        json.dump(context, open(sys.argv[3], 'w'))
+    else:
+        renderReport(context)
+    json.dump(cache, open('cache.json', 'w'), indent=4)
 
 if __name__ == '__main__':
     main()
