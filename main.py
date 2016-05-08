@@ -12,6 +12,7 @@ from dateutil import tz
 import time
 import random
 import copy
+from time import sleep
 
 export_json = False
 if len(sys.argv) == 4 and sys.argv[2] == '--json':
@@ -81,6 +82,17 @@ def td_format(td_object, v=False):
 
     return ", ".join(strings)
 
+def getData(url):
+    resp = requests.get(url, auth=HTTPBasicAuth(login, token))
+    items = resp.json()
+    if 'message' in items and items['message'] == 'API rate limit exceeded for averrin.':
+      ts = resp.headers['x-ratelimit-reset']
+      d = datetime.fromtimestamp(int(ts))
+      print('waiting till %s' % d)
+      sleep((d - datetime.now()).total_seconds() + 2)
+      return getData(url)
+    else:
+      return items
 
 def fetch(_url, paginate=False, getter=None):
     print('Fetching: ' + _url)
@@ -93,18 +105,23 @@ def fetch(_url, paginate=False, getter=None):
         url = _url % p
     else:
         url = _url
-    items = requests.get(url, auth=HTTPBasicAuth(login, token)).json()
+    items = getData(url)
+    if 'issues' in url:
+        print(len(items))
+        if len(items) == 2:
+            print(items)
+            print(resp.headers)
     if getter is not None:
         items = getter(items)
     if paginate and len(items) == 100:
         p += 1
-        new_items = requests.get(
-            _url % p, auth=HTTPBasicAuth(login, token)).json()
+        print('fetch page: %s' %p)
+        new_items = getData(_url % p)
         items.extend(new_items)
-        while new_items:
+        while new_items and p < 10:
             p += 1
-            new_items = requests.get(
-                _url % p, auth=HTTPBasicAuth(login, token)).json()
+            print('fetch page: %s' %p)
+            new_items = getData(_url % p)
             items.extend(new_items)
 
     cache[_url] = {
@@ -116,8 +133,8 @@ def fetch(_url, paginate=False, getter=None):
 
 def retrieveIssues():
     _issues = fetch('https://api.github.com/search/issues?q=author:%s&page=%%s&per_page=100' %
-                    user, True, lambda x: x['items'])
-    issues = [x for x in _issues if user not in x[
+                    user, True, lambda x: x['items'] if 'items' in x else [])
+    issues = [x for x in _issues if not isinstance(x, str) and user not in x[
         'url'] and 'pull_request' not in x]
     _pulls = [x for x in _issues if 'pull_request' in x]
     pulls = []
@@ -175,8 +192,14 @@ def processPulls(pulls, repos):
     repos['pulls'].extend(pulls)
     repos['pulls_merged'] = len(
         [x for x in repos['pulls'] if x['info']['merged_at'] is not None])
-    repos['pulls_merged_per'] = '%s%%' % int(repos['pulls_merged'] / len(repos['pulls']) * 100)
-    repos['pulls_unmerged_per'] = '%s%%' % int((len(repos['pulls']) - repos['pulls_merged']) / len(repos['pulls']) * 100)
+    if len(repos['pulls']):
+        repos['pulls_merged_per'] = '%s%%' % int(repos['pulls_merged'] / len(repos['pulls']) * 100)
+    else:
+        repos['pulls_merged_per'] = 0
+    if len(repos['pulls']):
+        repos['pulls_unmerged_per'] = '%s%%' % int((len(repos['pulls']) - repos['pulls_merged']) / len(repos['pulls']) * 100)
+    else:
+        repos['pulls_unmerged_per'] = 0
     repos['pulls_repos'] = {}
     for pr in repos['pulls']:
         l = pr['info']['base']['repo']['language']
@@ -220,6 +243,7 @@ def renderReport(context):
 def main():
     info = fetch('https://api.github.com/users/%s' % user)
     issues, pulls = retrieveIssues()
+    print('pulls: %s' % len(pulls))
     repos = retrieveRepos(info)
     repos = processPulls(pulls, repos)
     del repos['items']
